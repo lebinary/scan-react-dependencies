@@ -7,8 +7,8 @@ const stat = promisify(fs.stat);
 
 const fileExtensions = [".js", ".ts", ".tsx"];
 const ignoreDirectories = ["node_modules"];
-const directoryPath =
-	"/Users/user/Desktop/Personal Workspace/dodo-crx";
+const directoryPath = "/Users/user/Desktop/Personal Workspace/dodo-crx";
+const ignoreTypes = ["string", "number", "bigint"];
 
 const searchDirectoryForFiles = async (
 	directoryPath,
@@ -54,32 +54,26 @@ async function main() {
 				node.getArguments().length > 0
 			) {
 				const dependencyArray = node.getArguments()[1];
-				dependencyArray.forEachDescendant((innerNode) => {
-					if (tsMorph.Node.isIdentifier(innerNode)) {
-						const row = innerNode.getStartLineNumber();
-						const col = innerNode.getStartLinePos();
-						const identifierText = innerNode.getText();
-						const type = innerNode.getType();
-						dependencies.push({
-							name: identifierText,
-							type: type ? type.getText() : "unknown",
-							row: row,
-							col: col,
-						});
-					}
-				});
+				if (dependencyArray) {
+					dependencyArray.forEachDescendant((innerNode) => {
+						const type = innerNode.getType()?.getText() ?? "unknown";
+						if (tsMorph.Node.isIdentifier(innerNode) && !ignoreTypes.includes(type)) {
+							dependencies.push({
+								name: innerNode.getText(),
+								type: type,
+								row: innerNode.getStartLineNumber(),
+							});
+						}
+					});
+				}
 			}
 		});
-		allDependencies.push({ [filePath]: dependencies });
-		// console.log(`${targetFile}: ${useEffectCount} occurrences of 'useEffect'`);
-		// console.log(`${targetFile}: ${dependencies.length} dependencies of 'useEffect'`);
 
-		// for (const dependency of dependencies) {
-		//     const dependencyType = isPrimitiveType(dependency) ? 'primitive' : 'object';
-		//     console.log(`Dependency: ${dependency}, Type: ${dependencyType}`);
-		// }
+		if (dependencies.length > 0) {
+			allDependencies.push({ [filePath]: dependencies });
+		}
 	}
-	console.log(allDependencies);
+	console.log(JSON.stringify(allDependencies, 4));
 }
 
 main();

@@ -8,13 +8,13 @@ import classNames from 'classnames';
 import { Utils } from '../utils';
 
 interface SearchbarType {
-  defaultTerm: string[];
+  defaultTerm: object;
   onSearch?: (value: string) => void;
   showAutocomplete?: boolean;
 }
 
 const Searchbar = ({
-  defaultTerm = [],
+  defaultTerm,
   onSearch,
   showAutocomplete = false,
 }: SearchbarType) => {

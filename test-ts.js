@@ -1,42 +1,42 @@
-const tsMorph = require('ts-morph');
+const tsMorph = require("ts-morph");
 
 // Create a new Project instance
 const project = new tsMorph.Project();
 
 // Load a TypeScript source file
-const filePath = '/Users/user/Desktop/Personal Workspace/dodo-crx/src/pages/Popup/Popup.tsx';
+const filePath =
+"/Users/user/Desktop/Personal Workspace/scan-react-dependencies/test_file.tsx";
 const sourceFile = project.addSourceFileAtPath(filePath);
+const typeChecker = project.getTypeChecker();
 
 // sourceFile.forEachDescendant(node => console.log(node));
 
 const dependencies = [];
 
 // Find and analyze useEffect calls
-sourceFile.forEachDescendant(node => {
-  if (
-    tsMorph.Node.isCallExpression(node) &&
-    node.getExpression().getText() === 'useEffect' &&
-    node.getArguments().length > 0
-  ) {
-    const dependencyArray = node.getArguments()[1];
-    dependencyArray.forEachDescendant(innerNode => {
-      if (tsMorph.Node.isIdentifier(innerNode)) {
-        const row = innerNode.getStartLineNumber();
-        const col = innerNode.getStartLinePos();
-        const identifierText = innerNode.getText();
-        const type = innerNode.getType();
-        dependencies.push({
-          name: identifierText,
-          type: type? type.getText() : 'unknown',
-          row: row,
-          col: col,
-        });
-      }
-    });
-  }
+sourceFile.forEachDescendant((node) => {
+	if (
+		tsMorph.Node.isCallExpression(node) &&
+		node.getExpression().getText() === "useEffect" &&
+		node.getArguments().length > 0
+	) {
+		const dependencyArray = node.getArguments()[1];
+		dependencyArray.forEachDescendant((innerNode) => {
+			if (tsMorph.Node.isIdentifier(innerNode)) {
+				const dependency = {
+					name: innerNode.getText(),
+					type: innerNode.getType().getText() ?? "unknown",
+					row: innerNode.getStartLineNumber(),
+					col: innerNode.getStartLinePos(),
+					symbol: innerNode.getType().getSymbol()?.getName() ?? "unknown",
+          local: innerNode.getLocal() ?? "unknown"
+				};
+
+        const originalNode = typeChecker.getSymbolAtLocation(innerNode);
+				console.log(originalNode.getValueDeclaration().getText());
+
+				dependencies.push(dependency);
+			}
+		});
+	}
 });
-
-// Remove duplicate dependencies
-const uniqueDependencies = [...new Set(dependencies)];
-
-console.log('Dependencies of useEffect:', uniqueDependencies);
