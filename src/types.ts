@@ -7,3 +7,9 @@ export interface DependencyItem {
 	type: string;
 	row: number;
 }
+
+export interface PathInfo {
+  exists: boolean;
+  isDirectory: boolean;
+  isFile: boolean;
+}

@@ -1,6 +1,6 @@
 import tsMorph, { Project } from "ts-morph";
 import { Directory } from "./Directory";
-import { Dependency, DependencyItem } from "./Scanner.d";
+import { Dependency, DependencyItem } from "./types";
 
 const PRIMATIVE_TYPES = ["string", "number", "bigint"];
 
