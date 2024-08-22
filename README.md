@@ -1,7 +1,7 @@
 # UseEffect Scanner
 
-## What does project do
-We all know it is not recommended to pass **Object inside useEffect's dependency array**.\
+## What does this do?
+We all know it is not recommended to pass **an Object inside useEffect's dependency array**.\
 
 **Why?**\
 Because React uses shallow comparison to determine if dependencies have changed. Objects are compared by reference, not by their content.\
